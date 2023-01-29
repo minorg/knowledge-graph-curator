@@ -1,0 +1,27 @@
+{
+  "browser_action": {
+    "browser_style": true,
+    "default_title": "Knowledge graph curator",
+    "default_popup": "popup.html",
+    "default_icon": "./knowledge-graph-curator.svg"
+  },
+  "content_scripts": [{
+    "matches": ["*://en.wikipedia.org/*", "*://www.wikidata.org/*"],
+    "js": ["content_script.ts"],
+    "css": [],
+    "run_at": "document_idle"
+  }],
+  "description": "Web extension for curating knowledge graph statements from sites like Wikidata and Wikipedia",
+  "homepage_url": "https://github.com/minorg/knowledge-graph-curator",
+  "icons": {
+    "128": "./knowledge-graph-curator.svg"
+  },
+  "manifest_version": 3,
+  "name": "Knowledge graph curator",
+  "short_name": "knowledge-graph-curator",
+  "permissions": [
+    "https://www.wikidata.org/*",
+    "https://en.wikipedia.org/*"
+  ],
+  "version": "1.0.0"
+}
