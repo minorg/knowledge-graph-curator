@@ -21,9 +21,7 @@
   "name": "Knowledge graph curator",
   "short_name": "knowledge-graph-curator",
   "permissions": [
-    "storage",
-    "https://www.wikidata.org/*",
-    "https://en.wikipedia.org/*"
+    "storage"
   ],
   "version": "1.0.0"
 }
