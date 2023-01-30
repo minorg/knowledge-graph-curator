@@ -9,6 +9,10 @@
       "128": "./icon/knowledge-graph-curator-128x128.png"
     }
   },
+  "background": {
+    "service_worker": "background.ts",
+    "type": "module"
+  },
   "content_scripts": [{
     "matches": ["*://en.wikipedia.org/*", "*://www.wikidata.org/*"],
     "js": ["content_script.ts"],

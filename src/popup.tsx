@@ -119,8 +119,14 @@ import {createRoot} from "react-dom/client";
 //     }
 // }
 
-function render() {
-  createRoot(document.getElementById("root")!).render(<div>Hello, world</div>);
+const Popup: React.FunctionComponent = () => {
+  // chrome.tabs.get(0).then(tab);
+  // useEffect(() => () => {});
+  return <div></div>;
+};
+
+function load() {
+  createRoot(document.getElementById("root")!).render(<Popup />);
 }
 
-window.onload = render;
+window.onload = load;
