@@ -15,7 +15,7 @@
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "paths": {
-      "~*": ["./*"]
+      "~/*": ["./*"]
     },
     "sourceMap": true,
     "strict": true,

@@ -1,5 +1,6 @@
 {
   "extends": "@parcel/config-webextension",
+  "resolvers": ["...", "parcel-resolver-tspaths"],
   "transformers": {
     "*.{ts,tsx}": ["@parcel/transformer-typescript-tsc"]
   },

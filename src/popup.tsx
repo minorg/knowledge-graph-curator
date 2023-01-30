@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDom from "react-dom";
+import {createRoot} from "react-dom/client";
 
 // import Switch from '@material-ui/core/Switch';
 // import Button from '@material-ui/core/Button';
@@ -120,7 +120,7 @@ import ReactDom from "react-dom";
 // }
 
 function render() {
-  ReactDom.render(<div>Hello, world</div>, document.getElementById("root"));
+  createRoot(document.getElementById("root")!).render(<div>Hello, world</div>);
 }
 
 window.onload = render;
