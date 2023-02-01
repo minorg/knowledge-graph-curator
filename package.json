@@ -5,6 +5,7 @@
   "dependencies": {
     "@parcel/config-webextension": "^2.8.3",
     "@rdfjs/types": "^1.1.0",
+    "bootswatch": "^5.2.3",
     "n3": "^1.10.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",

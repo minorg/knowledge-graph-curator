@@ -1,13 +1,23 @@
 import {Translator} from "~/Translator";
-import {DetectedContentMessage} from "~/DetectedContentMessage";
-import invariant from "ts-invariant";
+import {
+  DetectedContentMessage,
+  detectedContentMessageSchema,
+} from "~/DetectedContentMessage";
 import {Store} from "n3";
 import {ScrapedContent} from "~/ScrapedContent";
+import * as yup from "yup";
 
-interface WikidataDetectedContentMessage extends DetectedContentMessage {
-  readonly conceptUri: string;
-  readonly type: "wikidata";
-}
+const WIKIDATA_TRANSLATOR_TYPE = "wikidata";
+
+const wikidataDetectedContentMessageSchema =
+  detectedContentMessageSchema.concat(
+    yup.object({
+      conceptUri: yup.string().required(),
+      type: yup
+        .string()
+        .matches(new RegExp("^" + WIKIDATA_TRANSLATOR_TYPE + "$")),
+    })
+  );
 
 export class WikidataTranslator implements Translator {
   detect() {
@@ -41,15 +51,18 @@ export class WikidataTranslator implements Translator {
 
   scrape(kwds: {detectedContentMessage: DetectedContentMessage}) {
     const {detectedContentMessage} = kwds;
-    invariant(detectedContentMessage.type === this.type);
-    // @ts-ignore
-    const {conceptUri} =
-      detectedContentMessage as WikidataDetectedContentMessage;
 
-    const dataset = new Store();
-
-    return new Promise<ScrapedContent>((resolve, reject) => resolve({dataset}));
+    return new Promise<ScrapedContent>((resolve, reject) => {
+      const wikidataDetectedContentMessage =
+        wikidataDetectedContentMessageSchema.validateSync(
+          JSON.stringify(JSON.stringify(detectedContentMessage))
+        );
+      // @ts-ignore
+      const {conceptUri} = wikidataDetectedContentMessage;
+      const dataset = new Store();
+      resolve({dataset});
+    });
   }
 
-  readonly type = "wikidata";
+  readonly type = WIKIDATA_TRANSLATOR_TYPE;
 }

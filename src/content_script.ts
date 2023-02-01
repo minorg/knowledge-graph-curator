@@ -1,5 +1,6 @@
 import {translators} from "~/translators/translators";
 import invariant from "ts-invariant";
+import {NO_DETECTED_CONTENT_MESSAGE_TYPE} from "~/NoDetectedContentMessage";
 
 const detectContent = () => {
   console.debug("detecting content");
@@ -17,8 +18,11 @@ const detectContent = () => {
     );
     invariant(detectedContentMessage.type === translator.type);
     chrome.runtime.sendMessage(detectedContentMessage);
-    break;
+    return;
   }
+
+  console.debug("no content detected");
+  chrome.runtime.sendMessage({type: NO_DETECTED_CONTENT_MESSAGE_TYPE});
 };
 
 document.onreadystatechange = detectContent;

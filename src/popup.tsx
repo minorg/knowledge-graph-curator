@@ -1,128 +1,89 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {createRoot} from "react-dom/client";
+import {ScrapedContent} from "~/ScrapedContent";
+import {SessionStorage} from "~/SessionStorage";
+import {translators} from "~/translators/translators";
+import {Alert, Col, Container, Row} from "reactstrap";
+import {NO_DETECTED_CONTENT_MESSAGE_TYPE} from "~/NoDetectedContentMessage";
+import "bootswatch/dist/lumen/bootstrap.min.css";
 
-// import Switch from '@material-ui/core/Switch';
-// import Button from '@material-ui/core/Button';
-//
-// import FormGroup from '@material-ui/core/FormGroup';
-// import FormControlLabel from '@material-ui/core/FormControlLabel';
-// import CircularProgress from '@material-ui/core/CircularProgress';
-//
-// import React, { Component } from 'react';
-// import ReactDom from "react-dom";
-//
-// export const CONFIG_KEY = "WYZRD_CONFIG";
-//
-// const DEFAULT_VALUE: ConfigObject = {
-//     showOrbs: true,
-//     allowAnon: false,
-//     usePsychiq: true,
-//     syncd: false
-// }
-//
-// export function getConfig(): Promise<ConfigObject> {
-//     return new Promise<ConfigObject>(function (resolve, reject) {
-//         chrome.storage.sync.get(CONFIG_KEY,
-//             function(result: any) {
-//                 if (result[CONFIG_KEY]) {
-//                     resolve(result[CONFIG_KEY]);
-//                 } else {
-//                     // initialize the config
-//
-//                     chrome.storage.sync.set({
-//                         [CONFIG_KEY]: DEFAULT_VALUE
-//                     });
-//                     resolve(DEFAULT_VALUE);
-//                 }
-//             });
-//     });
-// }
-//
-// export interface ConfigObject {
-//     syncd: boolean;
-//     showOrbs?: boolean;
-//     allowAnon?: boolean;
-//     usePsychiq?:  boolean;
-// }
-//
-// class Config extends Component<{}, ConfigObject> {
-//     constructor(props: {}) {
-//         super(props);
-//         this.state = {
-//             syncd: false
-//         };
-//         this.updateConfig();
-//     }
-//
-//     updateConfig() {
-//         getConfig().then((conf) => {
-//             this.setState(conf);
-//             this.setState({
-//                 syncd: true
-//             });
-//         });
-//     }
-//
-//     handleShowOrbChange(evt: React.ChangeEvent<{}>, checked: boolean) {
-//         const update = {
-//             showOrbs: checked
-//         }
-//         let newState = Object.assign(this.state, update);
-//
-//         chrome.storage.sync.set({
-//             [CONFIG_KEY]: newState
-//         }, () => this.updateConfig());
-//
-//     }
-//
-//     handleAllowAnonChange(evt: React.ChangeEvent<{}>, checked: boolean) {
-//         const update = {
-//             allowAnon: checked
-//         }
-//         let newState = Object.assign(this.state, update);
-//
-//         chrome.storage.sync.set({
-//             [CONFIG_KEY]: newState
-//         }, () => this.updateConfig());
-//
-//     }
-//
-//     handleUsePsychiqChange(evt: React.ChangeEvent<{}>, checked: boolean) {
-//         const update = {
-//             usePsychiq: checked
-//         }
-//         let newState = Object.assign(this.state, update);
-//
-//         chrome.storage.sync.set({
-//             [CONFIG_KEY]: newState
-//         }, () => this.updateConfig());
-//
-//     }
-//
-//
-//     render() {
-//         if (this.state.syncd) {
-//             return <React.Fragment>
-//                 <FormGroup>
-//                     <FormControlLabel control={<Switch checked={this.state.showOrbs !== false} onChange={this.handleShowOrbChange.bind(this)} />} label="Show Orbs" />
-//                     <FormControlLabel control={<Switch checked={this.state.allowAnon === true} onChange={this.handleAllowAnonChange.bind(this)} />} label="Allow Anon" />
-//                     <FormControlLabel control={<Switch checked={this.state.usePsychiq !== false} onChange={this.handleUsePsychiqChange.bind(this)} />} label="Load Suggestions" />
-//
-//                     <Button variant="contained" onClick={() => {chrome.storage.local.clear()}}>
-//                         Clear Cache
-//                     </Button>
-//                 </FormGroup>
-//             </React.Fragment>;
-//         } else {
-//             return <CircularProgress />;
-//         }
-//     }
-// }
+const sessionStorage = new SessionStorage();
 
 const Popup: React.FunctionComponent = () => {
-  // chrome.tabs.get(0).then(tab);
-  // useEffect(() => () => {});
-  return <div></div>;
+  console.debug("popup: rendering");
+
+  const [error, setError] = useState<any>(null);
+  const [scrapedContent, setScrapedContent] = useState<ScrapedContent | null>(
+    null
+  );
+  const refreshScrapedContent = () => {
+    sessionStorage
+      .getCurrentDetectedContentMessage()
+      .then((detectedContentMessage) => {
+        if (!detectedContentMessage) {
+          console.debug("popup: no detected content message");
+          setError("No content detected");
+          return;
+        }
+
+        console.debug(
+          "popup: detected content message:",
+          JSON.stringify(detectedContentMessage)
+        );
+
+        if (detectedContentMessage.type === NO_DETECTED_CONTENT_MESSAGE_TYPE) {
+          setError("No content detected");
+          return;
+        }
+
+        for (const translator of translators) {
+          if (translator.type === detectedContentMessage.type) {
+            translator
+              .scrape({detectedContentMessage})
+              .then((scrapedContent) => {
+                console.debug(
+                  "popup: successfully scraped detected content ",
+                  JSON.stringify(detectedContentMessage)
+                );
+                setScrapedContent(scrapedContent);
+              }, setError);
+            return;
+          }
+        }
+
+        console.error(
+          "popup: no translator for detected content message:",
+          JSON.stringify(detectedContentMessage)
+        );
+        setError("No translator for detected content message");
+      }, setError);
+  };
+  useEffect(() => {
+    refreshScrapedContent();
+  }, []);
+
+  if (!error && !scrapedContent) {
+    return null;
+  }
+
+  let children: React.ReactElement;
+  if (error) {
+    children = (
+      <Alert className="rounded-0 text-center" color="danger" style={{marginBottom: 0; width: "100%"}}>
+        {error}
+      </Alert>
+    );
+  } else {
+    children = <div>Scraped content</div>;
+  }
+
+  return (
+    <Container fluid style={{minWidth: "400px"}}>
+      <Row className="px-0">
+        <Col className="px-0" xs={12}>{children}</Col>
+      </Row>
+    </Container>
+  );
 };
 
 function load() {
