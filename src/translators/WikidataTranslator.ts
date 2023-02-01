@@ -94,7 +94,7 @@ export class WikidataTranslator implements Translator {
   scrape(kwds: {detectedContentMessage: DetectedContentMessage}) {
     const {detectedContentMessage} = kwds;
     console.debug(
-      "wikidata translator: detected content message: ",
+      "Wikidata translator: detected content message: ",
       JSON.stringify(detectedContentMessage)
     );
     return wikidataDetectedContentMessageSchema
@@ -103,10 +103,10 @@ export class WikidataTranslator implements Translator {
         // @ts-ignore
         const {conceptUri} = wikidataDetectedContentMessage;
         const conceptTtlUri = conceptUri + ".ttl";
-        console.debug("wikidata translator: fetching", conceptTtlUri);
+        console.debug("Wikidata translator: fetching", conceptTtlUri);
         return fetch(conceptTtlUri).then((response) =>
           response.text().then((responseText) => {
-            console.debug("wikidata translator: fetched", conceptTtlUri);
+            console.debug("Wikidata translator: fetched", conceptTtlUri);
             const parser = new Parser();
             const sourceDataset = new Store();
             sourceDataset.addQuads(parser.parse(responseText));

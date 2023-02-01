@@ -14,7 +14,7 @@
     "type": "module"
   },
   "content_scripts": [{
-    "matches": ["*://en.wikipedia.org/*", "*://www.wikidata.org/*"],
+    "matches": ["*://commons.wikimedia.org/wiki/File:*", "*://www.wikidata.org/*"],
     "js": ["content_script.ts"],
     "css": [],
     "run_at": "document_idle"
