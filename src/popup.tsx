@@ -22,7 +22,7 @@ const Popup: React.FunctionComponent = () => {
       .then((detectedContentMessage) => {
         if (!detectedContentMessage) {
           console.debug("popup: no detected content message");
-          setError("No content detected");
+          setError("No content detected (implicit)");
           return;
         }
 
@@ -68,19 +68,26 @@ const Popup: React.FunctionComponent = () => {
 
   let children: React.ReactElement;
   if (error) {
+    console.debug("error type", typeof error);
     children = (
-      <Alert className="rounded-0 text-center" color="danger" style={{marginBottom: 0; width: "100%"}}>
-        {error}
+      <Alert
+        className="rounded-0 text-center"
+        color="danger"
+        style={{marginBottom: 0, width: "100%"}}
+      >
+        {error.toString()}
       </Alert>
     );
   } else {
-    children = <div>Scraped content</div>;
+    children = <div className="w-100">Scraped content</div>;
   }
 
   return (
     <Container fluid style={{minWidth: "400px"}}>
       <Row className="px-0">
-        <Col className="px-0" xs={12}>{children}</Col>
+        <Col className="px-0" xs={12}>
+          {children}
+        </Col>
       </Row>
     </Container>
   );

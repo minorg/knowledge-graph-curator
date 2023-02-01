@@ -51,11 +51,14 @@ export class WikidataTranslator implements Translator {
 
   scrape(kwds: {detectedContentMessage: DetectedContentMessage}) {
     const {detectedContentMessage} = kwds;
-
+    console.debug(
+      "wikidata translator: detected content message: ",
+      JSON.stringify(detectedContentMessage)
+    );
     return new Promise<ScrapedContent>((resolve, reject) => {
       const wikidataDetectedContentMessage =
         wikidataDetectedContentMessageSchema.validateSync(
-          JSON.stringify(JSON.stringify(detectedContentMessage))
+          detectedContentMessage
         );
       // @ts-ignore
       const {conceptUri} = wikidataDetectedContentMessage;
