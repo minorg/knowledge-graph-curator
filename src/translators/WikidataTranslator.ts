@@ -3,9 +3,11 @@ import {
   DetectedContentMessage,
   detectedContentMessageSchema,
 } from "~/DetectedContentMessage";
-import {Store} from "n3";
-import {ScrapedContent} from "~/ScrapedContent";
+import {DataFactory, Parser, Store} from "n3";
 import * as yup from "yup";
+import {ScrapedContent} from "~/ScrapedContent";
+import {DatasetCore} from "@rdfjs/types";
+import {dcterms, rdf, schema} from "@tpluscode/rdf-ns-builders";
 
 const WIKIDATA_TRANSLATOR_TYPE = "wikidata";
 
@@ -18,6 +20,46 @@ const wikidataDetectedContentMessageSchema =
         .matches(new RegExp("^" + WIKIDATA_TRANSLATOR_TYPE + "$")),
     })
   );
+
+const toParadicmsDataset = (wikidataDataset: Store): DatasetCore => {
+  for (const schemaDataset of wikidataDataset.getSubjects(
+    rdf.type,
+    schema.Dataset,
+    null
+  )) {
+    for (const schemaAbout of wikidataDataset.getObjects(
+      schemaDataset,
+      schema.about,
+      null
+    )) {
+      const conceptWikibaseItem = schemaAbout;
+
+      const paradicmsDataset = new Store();
+
+      const paradicmsSubject = DataFactory.blankNode();
+      paradicmsDataset.addQuad(
+        DataFactory.quad(
+          paradicmsSubject,
+          dcterms.relation,
+          conceptWikibaseItem
+        )
+      );
+
+      for (const enWikipediaPage of wikidataDataset.getSubjects(
+        schema.isPartOf,
+        DataFactory.namedNode("https://en.wikipedia.org/"),
+        null
+      )) {
+        paradicmsDataset.addQuad(
+          DataFactory.quad(paradicmsSubject, dcterms.relation, enWikipediaPage)
+        );
+      }
+
+      return paradicmsDataset;
+    }
+  }
+  throw new EvalError();
+};
 
 export class WikidataTranslator implements Translator {
   detect() {
@@ -55,16 +97,32 @@ export class WikidataTranslator implements Translator {
       "wikidata translator: detected content message: ",
       JSON.stringify(detectedContentMessage)
     );
-    return new Promise<ScrapedContent>((resolve, reject) => {
-      const wikidataDetectedContentMessage =
-        wikidataDetectedContentMessageSchema.validateSync(
-          detectedContentMessage
+    return wikidataDetectedContentMessageSchema
+      .validate(detectedContentMessage)
+      .then((wikidataDetectedContentMessage) => {
+        // @ts-ignore
+        const {conceptUri} = wikidataDetectedContentMessage;
+        const conceptTtlUri = conceptUri + ".ttl";
+        console.debug("wikidata translator: fetching", conceptTtlUri);
+        return fetch(conceptTtlUri).then((response) =>
+          response.text().then((responseText) => {
+            console.debug("wikidata translator: fetched", conceptTtlUri);
+            const parser = new Parser();
+            const sourceDataset = new Store();
+            sourceDataset.addQuads(parser.parse(responseText));
+            console.debug(
+              "parsed",
+              sourceDataset.size,
+              "quads into source dataset"
+            );
+            const scrapedContent: ScrapedContent = {
+              paradicmsDataset: toParadicmsDataset(sourceDataset),
+              sourceDataset,
+            };
+            return scrapedContent;
+          })
         );
-      // @ts-ignore
-      const {conceptUri} = wikidataDetectedContentMessage;
-      const dataset = new Store();
-      resolve({dataset});
-    });
+      });
   }
 
   readonly type = WIKIDATA_TRANSLATOR_TYPE;

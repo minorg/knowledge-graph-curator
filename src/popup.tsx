@@ -1,11 +1,13 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {createRoot} from "react-dom/client";
 import {ScrapedContent} from "~/ScrapedContent";
 import {SessionStorage} from "~/SessionStorage";
 import {translators} from "~/translators/translators";
 import {Alert, Col, Container, Row} from "reactstrap";
 import {NO_DETECTED_CONTENT_MESSAGE_TYPE} from "~/NoDetectedContentMessage";
+import {Prism as SyntaxHighlighter} from "react-syntax-highlighter";
 import "bootswatch/dist/lumen/bootstrap.min.css";
+import {datasetToString} from "~/datasetToString";
 
 const sessionStorage = new SessionStorage();
 
@@ -62,13 +64,15 @@ const Popup: React.FunctionComponent = () => {
     refreshScrapedContent();
   }, []);
 
-  if (!error && !scrapedContent) {
-    return null;
-  }
+  const scrapedContentString = useMemo(() => {
+    if (!scrapedContent) {
+      return null;
+    }
+    return datasetToString(scrapedContent.paradicmsDataset);
+  }, [scrapedContent]);
 
   let children: React.ReactElement;
   if (error) {
-    console.debug("error type", typeof error);
     children = (
       <Alert
         className="rounded-0 text-center"
@@ -78,8 +82,22 @@ const Popup: React.FunctionComponent = () => {
         {error.toString()}
       </Alert>
     );
+  } else if (scrapedContent) {
+    children = (
+      <SyntaxHighlighter language="turtle">
+        {scrapedContentString!}
+      </SyntaxHighlighter>
+    );
   } else {
-    children = <div className="w-100">Scraped content</div>;
+    children = (
+      <Alert
+        className="rounded-0 text-center"
+        color="secondary"
+        style={{marginBottom: 0, width: "100%"}}
+      >
+        Loading...
+      </Alert>
+    );
   }
 
   return (

@@ -1,5 +1,6 @@
 import {DatasetCore} from "@rdfjs/types";
 
 export interface ScrapedContent {
-  readonly dataset: DatasetCore;
+  readonly paradicmsDataset: DatasetCore;
+  readonly sourceDataset: DatasetCore;
 }
