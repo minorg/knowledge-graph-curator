@@ -51,7 +51,7 @@ const datasetToYamlString = (dataset: DatasetCore): string => {
       if (quad.predicate.value.startsWith(namespaceUri)) {
         predicateString =
           namespacePrefix +
-          "_" +
+          ":" +
           quad.predicate.value.substring(namespaceUri.length);
         break;
       }

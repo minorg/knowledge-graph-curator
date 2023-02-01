@@ -8,12 +8,16 @@ import {NO_DETECTED_CONTENT_MESSAGE_TYPE} from "~/NoDetectedContentMessage";
 import {Prism as SyntaxHighlighter} from "react-syntax-highlighter";
 import "bootswatch/dist/lumen/bootstrap.min.css";
 import {datasetToString} from "~/datasetToString";
+import {CopyToClipboard} from "react-copy-to-clipboard";
+import {faCopy} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 const sessionStorage = new SessionStorage();
 
 const Popup: React.FunctionComponent = () => {
   console.debug("popup: rendering");
 
+  const [copied, setCopied] = useState<boolean>(false);
   const [error, setError] = useState<any>(null);
   const [scrapedContent, setScrapedContent] = useState<ScrapedContent | null>(
     null
@@ -84,16 +88,37 @@ const Popup: React.FunctionComponent = () => {
     );
   } else if (scrapedContent) {
     children = (
-      <SyntaxHighlighter language="turtle">
-        {scrapedContentString!}
-      </SyntaxHighlighter>
+      <Container fluid>
+        <Row>
+          <Col className="text-end" xs={12}>
+            <div className="me-1 pt-2" style={{cursor: "pointer"}}>
+              <CopyToClipboard
+                onCopy={() => setCopied(true)}
+                text={scrapedContentString!}
+              >
+                <FontAwesomeIcon icon={faCopy} size="lg" />
+              </CopyToClipboard>
+              {copied ? (
+                <span className="text-success">&nbsp;&nbsp;Copied</span>
+              ) : null}
+            </div>
+          </Col>
+        </Row>
+        <Row>
+          <Col xs={12}>
+            <SyntaxHighlighter language="turtle">
+              {scrapedContentString!}
+            </SyntaxHighlighter>
+          </Col>
+        </Row>
+      </Container>
     );
   } else {
     children = (
       <Alert
         className="rounded-0 text-center"
         color="secondary"
-        style={{marginBottom: 0, width: "100%"}}
+        style={{marginBottom: 0, minWidth: "32em"}}
       >
         Loading...
       </Alert>
@@ -101,7 +126,7 @@ const Popup: React.FunctionComponent = () => {
   }
 
   return (
-    <Container fluid style={{minWidth: "400px"}}>
+    <Container className="px-0" fluid>
       <Row className="px-0">
         <Col className="px-0" xs={12}>
           {children}

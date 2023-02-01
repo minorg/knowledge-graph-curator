@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "license": "GPL-3.0-only",
   "dependencies": {
-    "@parcel/config-webextension": "^2.8.3",
+    "@fortawesome/fontawesome-svg-core": "1.2.35",
+    "@fortawesome/free-solid-svg-icons": "5.15.3",
+    "@fortawesome/react-fontawesome": "0.1.14",
     "@rdfjs/term-set": "^1.1.0",
     "@rdfjs/types": "^1.1.0",
     "@tpluscode/rdf-ns-builders": "^2.0.1",
@@ -20,6 +22,7 @@
   },
   "devDependencies": {
     "@parcel/config-default": "^2.8.3",
+    "@parcel/config-webextension": "^2.8.3",
     "@parcel/core": "^2.8.3",
     "@parcel/transformer-image": "^2.8.3",
     "@parcel/transformer-typescript-tsc": "^2.8.3",
@@ -28,6 +31,7 @@
     "@types/js-yaml": "^4.0.5",
     "@types/n3": "^1.10.4",
     "@types/rdfjs__term-set": "^1.0.3",
+    "@types/react-copy-to-clipboard": "^5.0.4",
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
     "@types/react-syntax-highlighter": "^15.5.6",
