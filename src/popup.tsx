@@ -14,6 +14,8 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Configuration} from "~/Configuration";
 import {SyncStorage} from "~/SyncStorage";
 
+const MIN_WIDTH = 400;
+
 const sessionStorage = new SessionStorage();
 const syncStorage = new SyncStorage();
 
@@ -178,7 +180,10 @@ const Popup: React.FunctionComponent = () => {
         </Row>
         <Row>
           <Col xs={12}>
-            <SyntaxHighlighter language={syntaxHighlighterLanguage}>
+            <SyntaxHighlighter
+              customStyle={{backgroundColor: "white", minWidth: MIN_WIDTH}}
+              language={syntaxHighlighterLanguage}
+            >
               {scrapedContentString!}
             </SyntaxHighlighter>
           </Col>
@@ -188,9 +193,9 @@ const Popup: React.FunctionComponent = () => {
   } else {
     children = (
       <Alert
-        className="rounded-0 text-center"
+        className="h-100 rounded-0 text-center"
         color="secondary"
-        style={{marginBottom: 0, minWidth: "32em"}}
+        style={{marginBottom: 0, minWidth: MIN_WIDTH}}
       >
         Loading...
       </Alert>
@@ -198,11 +203,9 @@ const Popup: React.FunctionComponent = () => {
   }
 
   return (
-    <Container className="px-0" fluid>
-      <Row className="px-0">
-        <Col className="px-0" xs={12}>
-          {children}
-        </Col>
+    <Container className="px-0" fluid style={{minWidth: MIN_WIDTH}}>
+      <Row className="h-100 px-0">
+        <Col className="h-100 px-0">{children}</Col>
       </Row>
     </Container>
   );
