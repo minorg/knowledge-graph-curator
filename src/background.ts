@@ -12,7 +12,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   detectedContentMessageSchema
     .validate(message)
     .then((detectedContentMessage) =>
-      sessionStorage.setCurrentDetectedContentMessage(detectedContentMessage)
+      sessionStorage.setDetectedContentMessage(detectedContentMessage)
     );
 });
 

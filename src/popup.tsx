@@ -30,35 +30,35 @@ const Popup: React.FunctionComponent = () => {
   );
 
   const refreshScrapedContent = () => {
-    sessionStorage
-      .getCurrentDetectedContentMessage()
-      .then((detectedContentMessage) => {
-        if (!detectedContentMessage) {
-          console.debug("popup: no detected content message");
-          setError("No content detected (implicit)");
+    chrome.tabs
+      .query({active: true, currentWindow: true})
+      .then((currentTabs) => {
+        const currentTab = currentTabs[0];
+        if (!currentTab.url) {
+          console.error("popup: current tab has no URL");
+          setError("Current tab has no URL");
           return;
         }
 
-        console.debug(
-          "popup: detected content message:",
-          JSON.stringify(detectedContentMessage)
-        );
+        sessionStorage
+          .getDetectedContentMessage(currentTab.url)
+          .then((detectedContentMessage) => {
+            if (!detectedContentMessage) {
+              console.debug("popup: no detected content message");
+              setError("No content detected (implicit)");
+              return;
+            }
 
-        if (detectedContentMessage.type === NO_DETECTED_CONTENT_MESSAGE_TYPE) {
-          setError("No content detected");
-          return;
-        }
+            console.debug(
+              "popup: detected content message:",
+              JSON.stringify(detectedContentMessage)
+            );
 
-        chrome.tabs
-          .query({active: true, currentWindow: true})
-          .then((currentTabs) => {
-            const currentTab = currentTabs[0];
-            console.info("Current tabs:", currentTabs);
-            if (detectedContentMessage.windowLocation !== currentTab.url) {
-              console.debug(
-                `popup: content in another window: ${detectedContentMessage.windowLocation} vs ${currentTab.url}`
-              );
+            if (
+              detectedContentMessage.type === NO_DETECTED_CONTENT_MESSAGE_TYPE
+            ) {
               setError("No content detected");
+              return;
             }
 
             for (const translator of translators) {
