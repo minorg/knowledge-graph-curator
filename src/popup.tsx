@@ -11,17 +11,24 @@ import {datasetToString} from "~/datasetToString";
 import {CopyToClipboard} from "react-copy-to-clipboard";
 import {faCopy} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {Configuration} from "~/Configuration";
+import {SyncStorage} from "~/SyncStorage";
 
 const sessionStorage = new SessionStorage();
+const syncStorage = new SyncStorage();
 
 const Popup: React.FunctionComponent = () => {
-  console.debug("popup: rendering");
-
   const [copied, setCopied] = useState<boolean>(false);
+
+  // @ts-ignore
+  const [configuration, setConfiguration] = useState<Configuration | null>(
+    null
+  );
   const [error, setError] = useState<any>(null);
   const [scrapedContent, setScrapedContent] = useState<ScrapedContent | null>(
     null
   );
+
   const refreshScrapedContent = () => {
     sessionStorage
       .getCurrentDetectedContentMessage()
@@ -68,12 +75,22 @@ const Popup: React.FunctionComponent = () => {
     refreshScrapedContent();
   }, []);
 
+  useEffect(() => {
+    syncStorage.getConfiguration().then(setConfiguration, setError);
+  }, []);
+
   const scrapedContentString = useMemo(() => {
-    if (!scrapedContent) {
+    if (!configuration || !scrapedContent) {
       return null;
     }
-    return datasetToString(scrapedContent.paradicmsDataset);
-  }, [scrapedContent]);
+    return datasetToString(scrapedContent.paradicmsDataset, {
+      format: configuration.datasetStringFormat,
+    });
+  }, [configuration, scrapedContent]);
+
+  if (!configuration) {
+    return null;
+  }
 
   let children: React.ReactElement;
   if (error) {
@@ -87,11 +104,53 @@ const Popup: React.FunctionComponent = () => {
       </Alert>
     );
   } else if (scrapedContent) {
+    let syntaxHighlighterLanguage: string;
+    switch (configuration.datasetStringFormat) {
+      case "markdown-directory-yaml":
+        syntaxHighlighterLanguage = "YAML";
+        break;
+      case "Turtle":
+        syntaxHighlighterLanguage = "turtle";
+        break;
+      default:
+        throw new RangeError(configuration.datasetStringFormat);
+    }
+
     children = (
       <Container fluid>
         <Row>
-          <Col className="text-end" xs={12}>
-            <div className="me-1 pt-2" style={{cursor: "pointer"}}>
+          <Col className="d-flex" xs={12}>
+            <div className="ms-2 pt-2">
+              <Row className="align-items-center">
+                <label className="col-auto">Format</label>
+                <div className="col-auto">
+                  <select
+                    className="form-select"
+                    onChange={(ev) => {
+                      const newConfiguration: Configuration = {
+                        ...configuration,
+                        datasetStringFormat: ev.target.value,
+                      };
+                      console.debug(
+                        "popup: changed configuration:",
+                        JSON.stringify(newConfiguration)
+                      );
+                      syncStorage
+                        .setConfiguration(newConfiguration)
+                        .then(() => setConfiguration(newConfiguration));
+                    }}
+                    value={configuration.datasetStringFormat}
+                  >
+                    <option value="markdown-directory-yaml">
+                      Markdown directory YAML
+                    </option>
+                    <option>Turtle</option>
+                  </select>
+                </div>
+              </Row>
+            </div>
+            <div className="flex-grow-1"></div>
+            <div className="me-2 pt-2" style={{cursor: "pointer"}}>
               <CopyToClipboard
                 onCopy={() => setCopied(true)}
                 text={scrapedContentString!}
@@ -106,7 +165,7 @@ const Popup: React.FunctionComponent = () => {
         </Row>
         <Row>
           <Col xs={12}>
-            <SyntaxHighlighter language="yaml">
+            <SyntaxHighlighter language={syntaxHighlighterLanguage}>
               {scrapedContentString!}
             </SyntaxHighlighter>
           </Col>

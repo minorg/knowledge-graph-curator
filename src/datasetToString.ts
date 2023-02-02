@@ -9,9 +9,9 @@ const NAMESPACES_BY_PREFIX: {[index: string]: string} = {
   wd: "http://www.wikidata.org/entity/",
 };
 
-const datasetToYamlString = (dataset: DatasetCore): string => {
+const datasetToMarkdownDirectoryYamlString = (dataset: DatasetCore): string => {
   if (dataset.size === 0) {
-    console.debug("cannot convert empty dataset to YAML");
+    console.debug("cannot convert empty dataset to Markdown directory YAML");
     return "";
   }
 
@@ -77,8 +77,11 @@ export const datasetToString = (
   dataset: DatasetCore,
   options?: {format?: string}
 ): string => {
-  if (!options?.format || options.format.toLocaleLowerCase() === "yaml") {
-    return datasetToYamlString(dataset);
+  if (
+    !options?.format ||
+    options.format.toLocaleLowerCase() === "markdown-directory-yaml"
+  ) {
+    return datasetToMarkdownDirectoryYamlString(dataset);
   }
 
   const writer = new Writer({format: options.format});
