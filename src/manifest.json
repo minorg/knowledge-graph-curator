@@ -19,7 +19,7 @@
     "css": [],
     "run_at": "document_idle"
   }],
-  "description": "Web extension for curating RDF knowledge graph statements from sites like Wikidata and Wikipedia",
+  "description": "Web extension for curating RDF knowledge graph statements from sites like Wikidata and Wikimedia Commons",
   "homepage_url": "https://github.com/minorg/knowledge-graph-curator",
   "manifest_version": 3,
   "name": "Knowledge graph curator",
