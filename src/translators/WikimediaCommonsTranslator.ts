@@ -132,7 +132,9 @@ export class WikimediaCommonsTranslator implements Translator {
       .validate(detectedContentMessage)
       .then((wikimediaCommonsDetectedContentMessage) => {
         const paradicmsDataset = new Store();
-        const paradicmsSubject = DataFactory.blankNode();
+        const paradicmsSubject = DataFactory.namedNode(
+          wikimediaCommonsDetectedContentMessage.fileUri
+        );
         paradicmsDataset.addQuad(
           DataFactory.quad(
             paradicmsSubject,

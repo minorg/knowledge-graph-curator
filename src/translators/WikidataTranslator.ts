@@ -6,7 +6,7 @@ import {
 import {DataFactory, Parser, Store} from "n3";
 import * as yup from "yup";
 import {ScrapedContent} from "~/ScrapedContent";
-import {DatasetCore} from "@rdfjs/types";
+import {DatasetCore, NamedNode} from "@rdfjs/types";
 import {dcterms, rdf, schema} from "@tpluscode/rdf-ns-builders";
 
 const WIKIDATA_TRANSLATOR_TYPE = "wikidata";
@@ -36,7 +36,7 @@ const toParadicmsDataset = (wikidataDataset: Store): DatasetCore => {
 
       const paradicmsDataset = new Store();
 
-      const paradicmsSubject = DataFactory.blankNode();
+      const paradicmsSubject = conceptWikibaseItem as NamedNode;
       paradicmsDataset.addQuad(
         DataFactory.quad(
           paradicmsSubject,
