@@ -46,7 +46,7 @@
   "scripts": {
     "build": "parcel build src/manifest.json --target webext-prod",
     "build-debug": "parcel build src/manifest.json --target webext-prod --no-optimize ",
-    "bundle": "cd dist/webext-prod; zip -r ../wwwyzzerdd.zip *",
+    "bundle": "cd dist/webext-prod; zip -r ../knowledge-graph-curator.zip *",
     "clean": "rm -rf dist/*",
     "check": "tsc --noEmit",
     "start": "parcel src/manifest.json --hmr-port 8080 --host localhost --target webext-dev"

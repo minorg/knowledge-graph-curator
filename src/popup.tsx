@@ -106,7 +106,7 @@ const Popup: React.FunctionComponent = () => {
         </Row>
         <Row>
           <Col xs={12}>
-            <SyntaxHighlighter language="turtle">
+            <SyntaxHighlighter language="yaml">
               {scrapedContentString!}
             </SyntaxHighlighter>
           </Col>
