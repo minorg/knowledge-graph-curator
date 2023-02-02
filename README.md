@@ -15,6 +15,8 @@ See "Development", below.
 3. The popup displays the detected RDF
 4. Copy the detected RDF to your clipboard using the copy icon
 
+![Wikidata screenshot](wikidata-screenshot.png)
+
 ### With Wikimedia Commons
 
 1. Navigate to a Wikimedia Commons File page. For example:
@@ -24,6 +26,8 @@ See "Development", below.
 2. Open the extension's popup by clicking on its icon (a microscope) in the extensions bar
 3. The popup displays the detected RDF
 4. Copy the detected RDF to your clipboard using the copy icon
+
+![Wikimedia Commons screenshot](wikimedia-commons-screenshot.png)
 
 ## Development
 
