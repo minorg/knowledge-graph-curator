@@ -49,26 +49,39 @@ const Popup: React.FunctionComponent = () => {
           return;
         }
 
-        for (const translator of translators) {
-          if (translator.type === detectedContentMessage.type) {
-            translator
-              .scrape({detectedContentMessage})
-              .then((scrapedContent) => {
-                console.debug(
-                  "popup: successfully scraped detected content ",
-                  JSON.stringify(detectedContentMessage)
-                );
-                setScrapedContent(scrapedContent);
-              }, setError);
-            return;
-          }
-        }
+        chrome.tabs
+          .query({active: true, currentWindow: true})
+          .then((currentTabs) => {
+            const currentTab = currentTabs[0];
+            console.info("Current tabs:", currentTabs);
+            if (detectedContentMessage.windowLocation !== currentTab.url) {
+              console.debug(
+                `popup: content in another window: ${detectedContentMessage.windowLocation} vs ${currentTab.url}`
+              );
+              setError("No content detected");
+            }
 
-        console.error(
-          "popup: no translator for detected content message:",
-          JSON.stringify(detectedContentMessage)
-        );
-        setError("No translator for detected content message");
+            for (const translator of translators) {
+              if (translator.type === detectedContentMessage.type) {
+                translator
+                  .scrape({detectedContentMessage})
+                  .then((scrapedContent) => {
+                    console.debug(
+                      "popup: successfully scraped detected content ",
+                      JSON.stringify(detectedContentMessage)
+                    );
+                    setScrapedContent(scrapedContent);
+                  }, setError);
+                return;
+              }
+            }
+
+            console.error(
+              "popup: no translator for detected content message:",
+              JSON.stringify(detectedContentMessage)
+            );
+            setError("No translator for detected content message");
+          }, setError);
       }, setError);
   };
   useEffect(() => {

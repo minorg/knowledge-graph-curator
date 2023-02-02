@@ -118,6 +118,7 @@ export class WikimediaCommonsTranslator implements Translator {
       licenseUri,
       rightsStatementUri,
       type: this.type,
+      windowLocation: window.location.toString(),
     };
     return detectedContentMessage;
   }

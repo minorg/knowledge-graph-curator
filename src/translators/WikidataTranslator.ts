@@ -84,6 +84,7 @@ export class WikidataTranslator implements Translator {
         return {
           conceptUri: href.value,
           type: this.type,
+          windowLocation: window.location.toString(),
         };
       }
     }

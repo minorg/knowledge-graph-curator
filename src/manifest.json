@@ -25,7 +25,9 @@
   "name": "Knowledge graph curator",
   "short_name": "knowledge-graph-curator",
   "permissions": [
-    "storage"
+    "activeTab",
+    "storage",
+    "tabs"
   ],
   "version": "1.0.0"
 }
