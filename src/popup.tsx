@@ -41,6 +41,7 @@ const Popup: React.FunctionComponent = () => {
           setError("Current tab has no URL");
           return;
         }
+        console.debug("popup: current tab URL:", currentTab.url);
 
         sessionStorage
           .getDetectedContentMessage(currentTab.url)

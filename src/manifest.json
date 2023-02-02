@@ -26,8 +26,7 @@
   "short_name": "knowledge-graph-curator",
   "permissions": [
     "activeTab",
-    "storage",
-    "tabs"
+    "storage"
   ],
   "version": "1.0.0"
 }
